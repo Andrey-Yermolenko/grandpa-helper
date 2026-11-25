@@ -41,14 +41,7 @@ My grandpa lives in another country, so I can't sit next to him and fix his phon
 
 ## How it works
 
-```mermaid
-flowchart LR
-    A["Grandpa in Telegram"] -->|"message or photo"| B["Telegram Bot API"]
-    B -->|"webhook"| C["Next.js route on Vercel"]
-    C <-->|"history, notes, phone"| D[("Upstash Redis")]
-    C <-->|"prompt and last 30 messages"| E["Claude Haiku 5.5"]
-    C -->|"reply"| B
-```
+![How a message travels from Telegram through the webhook to Claude and Redis and back](assets/how-it-works.png)
 
 1. **He sends a message** in the Telegram group, as text or a photo.
 2. **Telegram passes it to a webhook** on Vercel. The route answers Telegram straight away and does the slow work afterwards, so Telegram never sends the same message twice.
@@ -59,17 +52,7 @@ flowchart LR
 
 "What phone do you have?" is a question he can't easily answer, so the bot never asks it. Instead I send `/phone` in the group once. The bot posts a short line in Russian with a 📱 OK button, and when he taps it a small page opens, shows a big ✅ and reads what the browser knows about the phone.
 
-```mermaid
-sequenceDiagram
-    participant Me
-    participant Bot
-    participant Phone as Grandpa's phone
-    Me->>Bot: /phone
-    Bot->>Phone: Short message in Russian with a 📱 OK button
-    Phone->>Bot: Signed page sends the user agent and client hints
-    Bot->>Bot: Saves something like "Samsung SM-A546B, Android 14"
-    Bot->>Phone: "I can see your phone now, ask me anything"
-```
+![The four steps of the phone check](assets/phone-check.png)
 
 - **Telegram for Android** adds the maker, model and Android version to the user agent of its own browser.
 - **Chrome's client hints** fill in the model when the user agent hides it.
